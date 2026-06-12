@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Black Russia | Ufa</title>
+    
+    <!-- Google Fonts: Inter + Montserrat -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Глобальные переменные — светлая тема */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f7fa;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5a5e6a;
+            --border-light: #e8ecef;
+            --card-bg: #f8f9fc;
+            --btn-bg: #ffffff;
+            --btn-border: #e0e4e8;
+            --accent: #e31e24;
+            --accent-hover: #c4171c;
+        }
+
+        /* Тёмная тема */
+        body.dark {
+            --bg-primary: #0a0a0c;
+            --bg-secondary: #131316;
+            --text-primary: #ededee;
+            --text-secondary: #9a9ea8;
+            --border-light: #23232a;
+            --card-bg: #131316;
+            --btn-bg: #1c1c22;
+            --btn-border: #2d2d35;
+        }
+
+        body {
+            font-family: 'Inter', 'Montserrat', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.25s ease, color 0.2s ease;
+            min-height: 100vh;
+        }
+
+        /* Кастомный фон (изображение) */
+        body.has-custom-bg {
+            background-size: cover !important;
+            background-position: center center !important;
+            background-attachment: fixed !important;
+            background-repeat: no-repeat !important;
+            position: relative;
+        }
+        
+        body.has-custom-bg::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.55);
+            backdrop-filter: brightness(0.85);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.8rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Панель управления */
+        .theme-panel {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .theme-toggle-btn, .bg-settings-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 60px;
+            background: var(--card-bg);
+            border: 1px solid var(--btn-border);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .theme-toggle-btn:hover, .bg-settings-btn:hover {
+            transform: scale(1.05);
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* Шторка */
+        .bg-drawer {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            width: 280px;
+            border: 1px solid var(--btn-border);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1001;
+        }
+
+        .bg-drawer.open {
+            display: flex;
+        }
+
+        .bg-drawer-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 8px;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .color-option {
+            width: 44px;
+            height: 44px;
+            border-radius: 60px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.1s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .color-option:hover {
+            transform: scale(1.08);
+            border-color: white;
+        }
+
+        .color-option.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .upload-area {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .upload-label {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            border-radius: 40px;
+            padding: 10px 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .upload-label:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .reset-bg {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            padding: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .reset-bg:hover {
+            background: rgba(227,30,36,0.1);
+            color: var(--accent);
+        }
+
+        /* Основной контент */
+        .hero {
+            text-align: center;
+            padding: 1.5rem 0 0.8rem;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .logo-symbol {
+            font-weight: 800;
+            font-size: 2rem;
+            background: var(--accent);
+            width: 56px;
+            height: 56px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .game-title {
+            font-size: clamp(2.2rem, 7vw, 4.6rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 75%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .server-badge {
+            display: inline-block;
+            background: var(--bg-secondary);
+            padding: 0.5rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .contact-card {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 1.5rem 2rem;
+            margin: 2rem auto;
+            max-width: 700px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            transition: 0.2s;
+        }
+
+        .contact-card .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        .email-highlight {
+            font-family: 'Inter', monospace;
+            background: var(--bg-primary);
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 0.7rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.25rem;
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .game-btn {
+            min-width: 230px;
+            padding: 0.9rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--btn-bg);
+            border: 1.5px solid var(--btn-border);
+            border-radius: 60px;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .game-btn i {
+            font-size: 1.2rem;
+            color: var(--accent);
+            transition: 0.2s;
+        }
+
+        .game-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(227,30,36,0.3);
+        }
+
+        .game-btn:hover i {
+            color: white;
+        }
+
+        .owner-nick-block {
+            background: var(--bg-secondary);
+            border-radius: 60px;
+            padding: 0.8rem 1.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            border: 1px solid var(--border-light);
+        }
+
+        .instruction-block {
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 1.6rem;
+            margin: 2rem auto;
+            max-width: 700px;
+            border: 1px solid var(--border-light);
+            text-align: left;
+        }
+
+        .instruction-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid var(--accent);
+            padding-left: 14px;
+        }
+
+        .step-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .step-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .brand-logo-footer {
+            text-align: center;
+            margin: 2rem 0 1.5rem;
+            padding: 1rem;
+        }
+
+        .brand-logo-footer img {
+            max-width: 180px;
+            height: auto;
+            opacity: 0.85;
+            transition: transform 0.2s;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+        }
+
+        .brand-logo-footer img:hover {
+            transform: scale(1.02);
+            opacity: 1;
+        }
+
+        .download-section {
+            text-align: center;
+            margin: 1rem 0 1rem;
+        }
+
+        /* Кнопка скачивания — теперь ссылка на официальный сайт BR */
+        .download-btn {
+            background: var(--accent);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 60px;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 8px 18px rgba(227,30,36,0.4);
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            background: #ff2f36;
+            box-shadow: 0 12px 24px rgba(227,30,36,0.6);
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 680px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            .game-btn {
+                min-width: 100%;
+            }
+            .bg-drawer {
+                width: 260px;
+                right: 16px;
+                bottom: 95px;
+            }
+            .theme-panel {
+                right: 16px;
+                bottom: 20px;
+            }
+            .instruction-block {
+                padding: 1.2rem;
+            }
+            .brand-logo-footer img {
+                max-width: 130px;
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero, .contact-card, .button-grid, .instruction-block, .brand-logo-footer, .download-section, .footer-note {
+            animation: fadeUp 0.45s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="brand">
+                <div class="logo-symbol">BR</div>
+                <h1 class="game-title">Black Russia</h1>
+            </div>
+            <div class="server-badge">
+                <i class="fas fa-server"></i> Сервер: Ufa (25)
+            </div>
+        </div>
+
+        <!-- Карточка связи -->
+        <div class="contact-card">
+            <div class="label">
+                <i class="fas fa-envelope"></i> Сотрудничество
+            </div>
+            <div class="text" style="margin-bottom: 6px;">
+                По любым вопросам и сотрудничеству свяжитесь через почту Gmail
+            </div>
+            <div class="email-highlight">
+                <i class="fas fa-at"></i> nazimkuvandykov14@gmail.com
+            </div>
+        </div>
+
+        <!-- Кнопки: группа (Telegram), ЛС владельца, Email -->
+        <div class="button-grid">
+            <a href="https://t.me/ufa_blackrussia" target="_blank" rel="noopener noreferrer" class="game-btn">
+                <i class="fab fa-telegram-plane"></i> Группа
+            </a>
+            
+            <div class="owner-nick-block">
+                <i class="fas fa-user-circle"></i> ЛС владельца: @ayanokoji031
+            </div>
+            
+            <a href="mailto:nazimkuvandykov14@gmail.com" class="game-btn">
+                <i class="fas fa-paper-plane"></i> Написать Email
+            </a>
+        </div>
+
+        <!-- Инструкция по установке -->
+        <div class="instruction-block">
+            <div class="instruction-title">
+                <i class="fas fa-download"></i> Инструкция по установке
+            </div>
+            <ul class="step-list">
+                <li><span class="step-number">1</span> Нажми на кнопку «Скачать лаунчер» ниже</li>
+                <li><span class="step-number">2</span> Ты перейдёшь на официальный сайт Black Russia</li>
+                <li><span class="step-number">3</span> Скачай лаунчер с официального источника</li>
+                <li><span class="step-number">4</span> Запусти установку и следуй инструкциям</li>
+                <li><span class="step-number">5</span> Готово! Добро пожаловать в Black Russia | Ufa (25)</li>
+            </ul>
+        </div>
+
+        <!-- Кнопка скачать лаунчер — переход на официальный сайт BR -->
+        <div class="download-section">
+            <a href="https://share.google/N4y44gayN09w33lSQ" target="_blank" rel="noopener noreferrer" class="download-btn">
+                <i class="fas fa-gamepad"></i> Скачать лаунчер
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+            <p style="font-size: 0.7rem; margin-top: 8px; opacity: 0.7;">Переход на официальный сайт Black Russia</p>
+        </div>
+
+        <!-- Логотип black.png (файл должен лежать рядом) -->
+        <div class="brand-logo-footer">
+            <img src="black.png" alt="Black Russia Logo" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 80\'%3E%3Crect width=\'200\' height=\'80\' fill=\'%23e31e24\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'white\' font-family=\'Arial\' font-weight=\'bold\' font-size=\'24\'%3EBLACK RUSSIA%3C/text%3E%3C/svg%3E';">
+            <p style="font-size: 0.7rem; margin-top: 8px; opacity: 0.6;">Black Russia | Ufa 25</p>
+        </div>
+
+        <div class="footer-note">
+            <span><i class="far fa-copyright"></i> Black Russia | Ufa (25)</span>
+            <span>•</span>
+            <span>Сервер Ufa</span>
+            <span>•</span>
+            <span><i class="fas fa-dice-d6"></i> Кастомный фон</span>
+        </div>
+    </div>
+
+    <!-- Панель управления темами и фоном -->
+    <div class="theme-panel">
+        <button class="theme-toggle-btn" id="themeToggle" aria-label="Сменить тему">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="bg-settings-btn" id="bgSettingsBtn" aria-label="Настройки фона">
+            <i class="fas fa-palette"></i>
+        </button>
+    </div>
+
+    <div class="bg-drawer" id="bgDrawer">
+        <div class="bg-drawer-title">
+            <i class="fas fa-fill-drip"></i> Фон / обои
+        </div>
+        <div class="color-palette" id="colorPalette">
+            <div class="color-option" style="background: #0b0b10;" data-color="#0b0b10"></div>
+            <div class="color-option" style="background: #1a1a1f;" data-color="#1a1a1f"></div>
+            <div class="color-option" style="background: #2c1a1a;" data-color="#2c1a1a"></div>
+            <div class="color-option" style="background: #101018;" data-color="#101018"></div>
+            <div class="color-option" style="background: #3a1e1e;" data-color="#3a1e1e"></div>
+            <div class="color-option" style="background: #000000;" data-color="#000000"></div>
+            <div class="color-option" style="background: #1e2a2a;" data-color="#1e2a2a"></div>
+            <div class="color-option" style="background: #2c2c2c;" data-color="#2c2c2c"></div>
+        </div>
+        <div class="upload-area">
+            <label class="upload-label" for="bgUpload">
+                <i class="fas fa-cloud-upload-alt"></i> Загрузить своё фото
+            </label>
+            <input type="file" id="bgUpload" accept="image/jpeg,image/png,image/webp" style="display: none;">
+            <div class="reset-bg" id="resetBgBtn">
+                <i class="fas fa-undo-alt"></i> Сбросить фон (стандартный)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const bgSettingsBtn = document.getElementById('bgSettingsBtn');
+            const bgDrawer = document.getElementById('bgDrawer');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const bgUpload = document.getElementById('bgUpload');
+            const resetBgBtn = document.getElementById('resetBgBtn');
+            
+            // Тёмная тема по умолчанию (геймерская атмосфера)
+            if (!localStorage.getItem('theme')) {
+                body.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                updateThemeIcon();
+            } else {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') body.classList.add('dark');
+                else body.classList.remove('dark');
+                updateThemeIcon();
+            }
+            
+            function updateThemeIcon() {
+                const icon = themeToggle.querySelector('i');
+                if (body.classList.contains('dark')) {
+                    icon.className = 'fas fa-sun';
+                } else {
+                    icon.className = 'fas fa-moon';
+                }
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                if (body.classList.contains('dark')) {
+                    body.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+                updateThemeIcon();
+            });
+            
+            bgSettingsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                bgDrawer.classList.toggle('open');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if (!bgDrawer.contains(e.target) && e.target !== bgSettingsBtn && !bgSettingsBtn.contains(e.target)) {
+                    bgDrawer.classList.remove('open');
+                }
+            });
+            
+            function resetCustomBackground() {
+                body.style.background = '';
+                body.style.backgroundImage = '';
+                body.classList.remove('has-custom-bg');
+                localStorage.removeItem('customBgImage');
+                localStorage.removeItem('customBgColor');
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+            }
+            
+            function applyColor(color) {
+                body.classList.remove('has-custom-bg');
+                body.style.backgroundImage = '';
+                body.style.background = color;
+                localStorage.setItem('customBgColor', color);
+                localStorage.removeItem('customBgImage');
+                colorOptions.forEach(opt => opt.classList.remove('active'));
+                const activeOpt = Array.from(colorOptions).find(opt => opt.dataset.color === color);
+                if (activeOpt) activeOpt.classList.add('active');
+            }
+            
+            function setBackgroundImage(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgUrl = e.target.result;
+                    body.style.background = `url(${imgUrl}) center center / cover no-repeat fixed`;
+                    body.classList.add('has-custom-bg');
+                    localStorage.removeItem('customBgColor');
+                    localStorage.setItem('customBgImage', imgUrl);
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            function loadSavedBackground() {
+                const savedColor = localStorage.getItem('customBgColor');
+                const savedImage = localStorage.getItem('customBgImage');
+                if (savedImage) {
+                    body.style.background = `url(${savedImage}) center center / cover no-repeat fixed`;
+                    body.classList.add('has-custom-bg');
+                } else if (savedColor) {
+                    body.classList.remove('has-custom-bg');
+                    body.style.background = savedColor;
+                    const activeColor = Array.from(colorOptions).find(opt => opt.dataset.color === savedColor);
+                    if (activeColor) activeColor.classList.add('active');
+                }
+            }
+            
+            colorOptions.forEach(opt => {
+                opt.addEventListener('click', () => {
+                    const color = opt.dataset.color;
+                    applyColor(color);
+                    bgDrawer.classList.remove('open');
+                });
+            });
+            
+            bgUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    setBackgroundImage(file);
+                    bgDrawer.classList.remove('open');
+                } else {
+                    alert('Пожалуйста, выберите изображение (jpg, png, webp)');
+                }
+                bgUpload.value = '';
+            });
+            
+            resetBgBtn.addEventListener('click', () => {
+                resetCustomBackground();
+                bgDrawer.classList.remove('open');
+            });
+            
+            loadSavedBackground();
+        })();
+    </script>
+</body>
+</html>
